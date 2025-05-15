@@ -58,6 +58,20 @@ static void MX_SPI1_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+  /* Prevent unused argument(s) compilation warning */
+  UNUSED(GPIO_Pin);
+  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_3, GPIO_PIN_RESET);
+  spi_tx_buf[0]= 0x29 | 0x80;
+  HAL_SPI_Transmit(&hspi1, spi_tx_buf,1,10); //10ms
+  HAL_SPI_Receive(&hspi1, spi_rx_buf,1,10); //10ms
+  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_3, GPIO_PIN_SET);
+
+  //toggle led
+
+}
+
 /* USER CODE END 0 */
 
 /**
@@ -93,14 +107,15 @@ int main(void)
   /* USER CODE BEGIN 2 */
   HAL_GPIO_WritePin(GPIOE, GPIO_PIN_3, GPIO_PIN_RESET);
   spi_tx_buf[0]= 0x20;
-  spi_tx_buf[1]= 0x11;
+  spi_tx_buf[1]= 0x91;
   HAL_SPI_Transmit(&hspi1, spi_tx_buf,2,10); //10ms
   HAL_GPIO_WritePin(GPIOE, GPIO_PIN_3, GPIO_PIN_SET);
 
+  //Interrupt
   HAL_GPIO_WritePin(GPIOE, GPIO_PIN_3, GPIO_PIN_RESET);
-  spi_tx_buf[0]= 0x20 | 0x80 ;
-  HAL_SPI_Transmit(&hspi1, spi_tx_buf, 1,10);
-  HAL_SPI_Receive(&hspi1, spi_rx_buf,1,10);
+  spi_tx_buf[0]= 0x23;
+  spi_tx_buf[1]= 0xC8;
+  HAL_SPI_Transmit(&hspi1, spi_tx_buf,2,10); //10ms
   HAL_GPIO_WritePin(GPIOE, GPIO_PIN_3, GPIO_PIN_SET);
 
   /* USER CODE END 2 */
@@ -112,11 +127,6 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_3, GPIO_PIN_RESET);
-	  spi_tx_buf[0]= 0x29 | 0x80 ;
-	  HAL_SPI_Transmit(&hspi1, spi_tx_buf, 1,10);
-	  HAL_SPI_Receive(&hspi1, spi_rx_buf,1,10);
-	  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_3, GPIO_PIN_SET);
 
   }
   /* USER CODE END 3 */
